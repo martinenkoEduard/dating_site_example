@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Сайт знакомств{% endblock %}
+
+{% block content %}
+<div class="text-center mb-3">
+    <h1>💕 Добро пожаловать на сайт знакомств!</h1>
+    <p class="text-secondary">Найдите свою вторую половинку среди тысяч пользователей</p>
+</div>
+
+<!-- Статистика -->
+<div class="card mb-3">
+    <h2 class="text-center mb-2">📊 Статистика платформы</h2>
+    <div class="profile-stats">
+        <div class="profile-stat">
+            <div class="profile-stat-value">{{ total_profiles }}</div>
+            <div class="profile-stat-label">Всего профилей</div>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-value">{{ male_profiles }}</div>
+            <div class="profile-stat-label">Мужчин</div>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-value">{{ female_profiles }}</div>
+            <div class="profile-stat-label">Женщин</div>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+    {% if has_profile %}
+        <!-- Добро пожаловать обратно -->
+        <div class="alert alert-success">
+            <h3>👋 С возвращением, {{ user.username }}!</h3>
+            <p>Ваш профиль активен. Начните поиск новых знакомств!</p>
+            <div class="d-flex gap-2 mt-2">
+                <a href="/profiles/search/" class="btn btn-primary">🔍 Искать профили</a>
+                <a href="/profiles/conversations/" class="btn btn-secondary">💬 Мои сообщения</a>
+                <a href="/profiles/my/" class="btn btn-outline">👤 Мой профиль</a>
+            </div>
+        </div>
+    {% else %}
+        <!-- Призыв создать профиль -->
+        <div class="alert alert-info">
+            <h3>🚀 Создайте свой профиль!</h3>
+            <p>Чтобы начать знакомства, вам нужно создать профиль. Это займет всего несколько минут!</p>
+            <a href="/profiles/create/" class="btn btn-primary">➕ Создать профиль</a>
+        </div>
+    {% endif %}
+{% else %}
+    <!-- Призыв к регистрации -->
+    <div class="alert alert-info">
+        <h3>🎯 Начните знакомства прямо сейчас!</h3>
+        <p>Зарегистрируйтесь и найдите свою любовь среди тысяч пользователей нашего сайта.</p>
+        <div class="d-flex gap-2 mt-2">
+            <a href="/auth/register/" class="btn btn-primary">📝 Регистрация</a>
+            <a href="/auth/login/" class="btn btn-secondary">🔐 Уже есть аккаунт?</a>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Новые профили -->
+{% if recent_profiles %}
+<div class="card">
+    <h2 class="text-center mb-2">🆕 Новые пользователи</h2>
+    <div class="profiles-grid">
+        {% for profile in recent_profiles %}
+        <div class="profile-card">
+            {% if profile.primary_photo %}
+                <img src="{{ profile.primary_photo.photo.url }}" alt="{{ profile.user.username }}" class="profile-photo">
+            {% else %}
+                <div class="profile-photo d-flex align-center justify-center" style="background: var(--border); color: var(--text-secondary); font-size: 4rem;">
+                    {% if profile.gender == 'male' %}👨{% elif profile.gender == 'female' %}👩{% else %}👤{% endif %}
+                </div>
+            {% endif %}
+            
+            <div class="profile-info">
+                <h3 class="profile-name">{{ profile.user.username }}</h3>
+                <div class="profile-age-location">
+                    {% if profile.age %}{{ profile.age }} лет{% endif %}
+                    {% if profile.city %}📍 {{ profile.city }}{% endif %}
+                </div>
+                
+                {% if profile.about %}
+                <p class="profile-description">{{ profile.about }}</p>
+                {% endif %}
+                
+                {% if user.is_authenticated and has_profile %}
+                <div class="profile-actions">
+                    <a href="/profiles/view/{{ profile.id }}/" class="btn btn-primary btn-small">👀 Смотреть</a>
+                    <a href="/profiles/message/{{ profile.user.id }}/" class="btn btn-secondary btn-small">💌 Написать</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Информационные блоки -->
+<div class="grid grid-2 mt-3">
+    <div class="card">
+        <h3>🔒 Безопасность</h3>
+        <p>Мы заботимся о вашей безопасности. Все профили проходят модерацию, а личные данные надежно защищены.</p>
+    </div>
+    
+    <div class="card">
+        <h3>💡 Советы по знакомствам</h3>
+        <ul>
+            <li>Будьте честными в своем профиле</li>
+            <li>Добавьте несколько хороших фотографий</li>
+            <li>Пишите интересные сообщения</li>
+            <li>Будьте вежливы и терпеливы</li>
+        </ul>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="text-center mt-3">
+    <div class="card" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white;">
+        <h3>✨ Готовы найти любовь?</h3>
+        <p>Присоединяйтесь к тысячам счастливых пар, которые нашли друг друга на нашем сайте!</p>
+        <a href="/auth/register/" class="btn" style="background: white; color: var(--primary-color); font-weight: 600;">
+            🚀 Начать знакомства
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль {{ profile.nickname }} - Сайт знакомств{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-main-photo">
+        {% if profile.primary_photo %}
+            <img src="{{ profile.primary_photo.photo.url }}" alt="{{ profile.nickname }}" class="profile-main-photo">
+        {% else %}
+            <div class="profile-main-photo d-flex align-center justify-center" style="background: var(--border); color: var(--text-secondary); font-size: 6rem;">
+                {% if profile.gender == 'male' %}👨{% elif profile.gender == 'female' %}👩{% else %}👤{% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="profile-details">
+        <h1 class="profile-title">
+            {% if profile.gender == 'male' %}👨{% elif profile.gender == 'female' %}👩{% else %}👤{% endif %}
+            {{ profile.nickname }}
+        </h1>
+        <p class="profile-subtitle">
+            {% if profile.age %}{{ profile.age }} лет{% endif %}
+            {% if profile.city %}📍 {{ profile.get_city_display }}{% endif %}
+        </p>
+        <p class="text-secondary">
+            <strong>Последний заход:</strong> {{ profile.last_online|date:"d.m.Y H:i" }}
+        </p>
+        
+        <!-- Action buttons -->
+        <div class="d-flex gap-2 mt-2">
+            {% if is_own %}
+                <a href="/profiles/edit/" class="btn btn-primary">✏️ Редактировать</a>
+                <a href="/profiles/photos/" class="btn btn-secondary">📸 Фотографии</a>
+            {% else %}
+                <a href="/profiles/message/{{ profile.user.id }}/" class="btn btn-primary">💌 Написать</a>
+                <a href="/profiles/report/{{ profile.user.id }}/" class="btn btn-outline">⚠️ Пожаловаться</a>
+            {% endif %}
+            <a href="/" class="btn btn-outline">🏠 На главную</a>
+        </div>
+    </div>
+</div>
+
+<!-- Photos Gallery -->
+{% if photos %}
+<div class="photos-gallery">
+    <h2 class="gallery-title">📸 Фотографии</h2>
+    <div class="photos-grid">
+        {% for photo in photos %}
+            <div class="photo-item">
+                <img src="{{ photo.image.url }}" alt="Фото {{ profile.nickname }}" onerror="this.parentElement.style.display='none';">
+                {% if photo.is_primary %}
+                    <div class="photo-overlay">
+                        <span style="background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: var(--border-radius); font-size: 0.8rem;">
+                            🌟 Основная
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Profile Information -->
+<div class="grid grid-2 mt-3">
+    <!-- Basic Info -->
+    <div class="card">
+        <h3>📋 Основная информация</h3>
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-value">{{ profile.height }}</div>
+                <div class="profile-stat-label">см (рост)</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value">{{ profile.weight }}</div>
+                <div class="profile-stat-label">кг (вес)</div>
+            </div>
+        </div>
+        
+        <div class="mt-2">
+            <p><strong>Группа крови:</strong> {{ profile.get_blood_group_display }}</p>
+            <p><strong>Пол:</strong> {{ profile.get_gender_display }}</p>
+        </div>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="card">
+        <h3>💝 Личная информация</h3>
+        <p><strong>Ориентация:</strong> {{ profile.get_orientation_display }}</p>
+        <p><strong>Семейное положение:</strong> {{ profile.get_marital_status_display }}</p>
+        <p><strong>Образование:</strong> {{ profile.get_education_display }}</p>
+        <p><strong>Занятость:</strong> {{ profile.get_employment_display }}</p>
+        
+        {% if profile.goal %}
+        <div class="mt-2">
+            <strong>Цель поиска:</strong><br>
+            <span class="text-secondary">{{ profile.goal }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Lifestyle -->
+<div class="card mt-3">
+    <h3>🏃 Образ жизни</h3>
+    <div class="grid grid-4">
+        <div class="profile-stat">
+            <div class="profile-stat-label">Курение</div>
+            <div class="profile-stat-value" style="font-size: 1rem;">{{ profile.get_smoking_display }}</div>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-label">Алкоголь</div>
+            <div class="profile-stat-value" style="font-size: 1rem;">{{ profile.get_alcohol_display }}</div>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-label">Спорт</div>
+            <div class="profile-stat-value" style="font-size: 1rem;">{{ profile.get_sport_display }}</div>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-label">Здоровье</div>
+            <div class="profile-stat-value">{{ profile.health_rating }}/10</div>
+        </div>
+    </div>
+</div>
+
+<!-- About section -->
+{% if profile.about %}
+<div class="card mt-3">
+    <h3>📝 О себе</h3>
+    <p>{{ profile.about|linebreaks }}</p>
+</div>
+{% endif %}
+
+<!-- Additional information for own profile -->
+{% if is_own %}
+<div class="alert alert-info mt-3">
+    <h4>💡 Советы по профилю</h4>
+    <ul class="mb-0">
+        <li>Добавьте несколько качественных фотографий</li>
+        <li>Напишите интересное описание о себе</li>
+        <li>Укажите свои интересы и увлечения</li>
+        <li>Будьте честными в заполнении профиля</li>
+    </ul>
+</div>
+{% endif %}
+{% endblock %} 

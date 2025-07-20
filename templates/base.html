@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Сайт знакомств{% endblock %}</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/profiles.css">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Meta tags for better SEO and social sharing -->
+    <meta name="description" content="{% block description %}Современный сайт знакомств для поиска новых людей и создания серьезных отношений{% endblock %}">
+    <meta name="keywords" content="знакомства, отношения, поиск, профиль, сообщения">
+    
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="{% block og_title %}Сайт знакомств{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Найдите свою вторую половинку{% endblock %}">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">💕 Знакомства</a>
+                
+                <nav class="nav-links">
+                    {% if user.is_authenticated %}
+                        <a href="/profiles/">🏠 Главная</a>
+                        <a href="/profiles/search/">🔍 Поиск</a>
+                        <a href="/profiles/advanced-search/">🔍+ Расширенный поиск</a>
+                        <a href="/profiles/conversations/">💬 Сообщения</a>
+                        {% if has_profile %}
+                            <a href="/profiles/my/">👤 Мой профиль</a>
+                            <a href="/profiles/photos/">📷 Фото</a>
+                        {% else %}
+                            <a href="/profiles/create/">➕ Создать профиль</a>
+                        {% endif %}
+                        <a href="/auth/logout/">🚪 Выход ({{ user.username }})</a>
+                    {% else %}
+                        <a href="/auth/login/">🔐 Вход</a>
+                        <a href="/auth/register/">📝 Регистрация</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block messages %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center mt-3 p-2" style="background: var(--background); border-top: 1px solid var(--border);">
+        <div class="container">
+            <p style="color: var(--text-secondary); margin: 0;">
+                © 2025 Сайт знакомств. Найдите свою любовь! 💕
+            </p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 
