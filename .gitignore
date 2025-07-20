@@ -168,8 +168,7 @@ cython_debug/
 # !*/migrations/__init__.py
 
 # Django static files (when collected)
-/static/
-/staticfiles/
+
 
 # Django media files (uploaded user content)
 /media/
