@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views_package import profile_views
 from .views_package import photo_views
+from .views_package import message_views
 
 app_name = 'profiles'
 
@@ -25,8 +26,8 @@ urlpatterns = [
     path('profiles/photos/set-primary/<int:photo_id>/', photo_views.set_primary_photo, name='set_primary_photo'),
     
     # Система сообщений
-    path('profiles/conversations/', views.conversations_list, name='conversations_list'),
-    path('profiles/conversations/<int:conversation_id>/', views.conversation_detail, name='conversation_detail'),
-    path('profiles/message/<int:user_id>/', views.start_conversation, name='start_conversation'),
-    path('profiles/report/<int:user_id>/', views.report_user, name='report_user'),
+    path('profiles/conversations/', message_views.conversations_list, name='conversations_list'),
+    path('profiles/conversations/<int:conversation_id>/', message_views.conversation_detail, name='conversation_detail'),
+    path('profiles/message/<int:user_id>/', message_views.start_conversation, name='start_conversation'),
+    path('profiles/report/<int:user_id>/', message_views.report_user, name='report_user'),
 ] 
