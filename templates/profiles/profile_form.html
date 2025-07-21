@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Сайт знакомств{% endblock %}
+
+{% block content %}
+<div class="profile-form-container">
+    <h1>👤 {{ title }}</h1>
+    
+    <form method="post" class="profile-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>📝 Основная информация</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.nickname.id_for_label }}">{{ form.nickname.label }}:</label>
+                    {{ form.nickname }}
+                    {% if form.nickname.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.nickname.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.age.id_for_label }}">{{ form.age.label }}:</label>
+                    {{ form.age }}
+                    {% if form.age.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.age.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.height.id_for_label }}">{{ form.height.label }}:</label>
+                    {{ form.height }}
+                    {% if form.height.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.height.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.weight.id_for_label }}">{{ form.weight.label }}:</label>
+                    {{ form.weight }}
+                    {% if form.weight.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.weight.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.blood_group.id_for_label }}">{{ form.blood_group.label }}:</label>
+                    {{ form.blood_group }}
+                    {% if form.blood_group.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.blood_group.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }}:</label>
+                    {{ form.gender }}
+                    {% if form.gender.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.gender.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
+                    {{ form.city }}
+                    {% if form.city.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.city.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>💝 Личная информация</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.orientation.id_for_label }}">{{ form.orientation.label }}:</label>
+                    {{ form.orientation }}
+                    {% if form.orientation.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.orientation.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.marital_status.id_for_label }}">{{ form.marital_status.label }}:</label>
+                    {{ form.marital_status }}
+                    {% if form.marital_status.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.marital_status.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.education.id_for_label }}">{{ form.education.label }}:</label>
+                    {{ form.education }}
+                    {% if form.education.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.education.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.employment.id_for_label }}">{{ form.employment.label }}:</label>
+                    {{ form.employment }}
+                    {% if form.employment.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.employment.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="{{ form.goal.id_for_label }}">{{ form.goal.label }}:</label>
+                    {{ form.goal }}
+                    {% if form.goal.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.goal.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>🏃 Образ жизни и здоровье</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.smoking.id_for_label }}">{{ form.smoking.label }}:</label>
+                    {{ form.smoking }}
+                    {% if form.smoking.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.smoking.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.alcohol.id_for_label }}">{{ form.alcohol.label }}:</label>
+                    {{ form.alcohol }}
+                    {% if form.alcohol.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.alcohol.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.sport.id_for_label }}">{{ form.sport.label }}:</label>
+                    {{ form.sport }}
+                    {% if form.sport.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.sport.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.health_rating.id_for_label }}">{{ form.health_rating.label }}:</label>
+                    {{ form.health_rating }}
+                    {% if form.health_rating.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.health_rating.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <div class="form-check">
+                        {{ form.has_diseases }}
+                        <label for="{{ form.has_diseases.id_for_label }}">{{ form.has_diseases.label }}</label>
+                    </div>
+                    {% if form.has_diseases.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.has_diseases.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button type="submit" class="btn">💾 Сохранить</button>
+            <a href="/" class="btn btn-secondary">🏠 На главную</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .form-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        gap: 15px;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+        margin-bottom: 15px;
+    }
+    
+    .form-group.full-width {
+        flex: 1 1 100%;
+    }
+    
+    .form-group.checkbox-group {
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .form-control, input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus, input:focus, select:focus, textarea:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-check input[type="checkbox"] {
+        width: auto;
+        margin-right: 10px;
+    }
+    
+    .buttons {
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    .btn {
+        padding: 14px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        margin-right: 10px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0;
+    }
+    
+    .errorlist li {
+        color: #721c24;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}

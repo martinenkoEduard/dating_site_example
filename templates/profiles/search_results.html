@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}Поиск профилей - Сайт знакомств{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <h1>🔍 Поиск профилей</h1>
+    
+    <div class="search-section">
+        <form method="get" class="search-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }}:</label>
+                {{ form.gender }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.age_min.id_for_label }}">{{ form.age_min.label }}:</label>
+                {{ form.age_min }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.age_max.id_for_label }}">{{ form.age_max.label }}:</label>
+                {{ form.age_max }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.height_min.id_for_label }}">{{ form.height_min.label }}:</label>
+                {{ form.height_min }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.height_max.id_for_label }}">{{ form.height_max.label }}:</label>
+                {{ form.height_max }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
+                {{ form.city }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.education.id_for_label }}">{{ form.education.label }}:</label>
+                {{ form.education }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.employment.id_for_label }}">{{ form.employment.label }}:</label>
+                {{ form.employment }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.smoking.id_for_label }}">{{ form.smoking.label }}:</label>
+                {{ form.smoking }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.alcohol.id_for_label }}">{{ form.alcohol.label }}:</label>
+                {{ form.alcohol }}
+            </div>
+            
+            <div class="search-buttons">
+                <button type="submit" class="btn">🔍 Найти</button>
+                <a href="/profiles/search/" class="btn btn-clear">🗑️ Очистить</a>
+                <a href="/" class="btn btn-secondary">🏠 Главная</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="results-header">
+        <h2>Результаты поиска</h2>
+        <div class="results-count">Найдено: {{ total_count }} профилей (показано: {{ profiles|length }})</div>
+    </div>
+    
+    {% if profiles %}
+        <div class="profiles-grid">
+            {% for profile in profiles %}
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-icon">{% if profile.gender == 'male' %}👨{% else %}👩{% endif %}</div>
+                        <div class="profile-name">{{ profile.nickname }}</div>
+                    </div>
+                    
+                    <!-- Получаем главную фотографию -->
+                    {% for photo in profile.photos.all %}
+                        {% if photo.is_primary and photo.image %}
+                            <div class="profile-photo">
+                                <img src="{{ photo.image.url }}" alt="Фото {{ profile.nickname }}" 
+                                     style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;"
+                                     onerror="this.style.display='none';">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="profile-info">
+                        <strong>Возраст:</strong> {{ profile.age }} лет
+                    </div>
+                    <div class="profile-info">
+                        <strong>Город:</strong> {{ profile.get_city_display }}
+                    </div>
+                    <div class="profile-info">
+                        <strong>Рост:</strong> {{ profile.height }} см
+                    </div>
+                    <div class="profile-info">
+                        <strong>Образование:</strong> {{ profile.get_education_display }}
+                    </div>
+                    <div class="profile-info">
+                        <strong>Последний заход:</strong> {{ profile.last_online|date:"d.m.Y H:i" }}
+                    </div>
+                    <div class="profile-goal">
+                        "{{ profile.goal|truncatechars:100 }}"
+                    </div>
+                    <div class="profile-actions">
+                        <a href="{% url 'profiles:view_profile' profile.id %}" class="btn btn-small">👁️ Посмотреть</a>
+                        <a href="/profiles/message/{{ profile.user.id }}/" class="btn btn-small">💌 Написать</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if total_count > 50 %}
+            <div style="text-align: center; margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px;">
+                <p><strong>Показано первых 50 профилей из {{ total_count }}.</strong></p>
+                <p>Используйте фильтры для уточнения поиска.</p>
+            </div>
+        {% endif %}
+        
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                <div class="pagination-info">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} 
+                    ({{ page_obj.start_index }}-{{ page_obj.end_index }} из {{ total_count }} профилей)
+                </div>
+                <div class="pagination-controls">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-pagination">« Первая</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-pagination">‹ Предыдущая</a>
+                    {% endif %}
+                    
+                    {% for page_num in page_obj.paginator.page_range %}
+                        {% if page_num == page_obj.number %}
+                            <span class="btn btn-pagination btn-current">{{ page_num }}</span>
+                        {% elif page_num >= page_obj.number|add:'-2' and page_num <= page_obj.number|add:'2' %}
+                            <a href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-pagination">{{ page_num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-pagination">Следующая ›</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn btn-pagination">Последняя »</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-results">
+            <h3>😔 Профили не найдены</h3>
+            <p>Попробуйте изменить параметры поиска или очистить фильтры.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .search-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .search-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .form-control, input, select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e1e1e1;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus, input:focus, select:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .search-buttons {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 10px;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .btn-clear {
+        background: #ffc107;
+        color: #333;
+    }
+    
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .results-count {
+        color: #666;
+    }
+    
+    .profiles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .profile-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s;
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .profile-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+    
+    .profile-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .profile-info {
+        margin-bottom: 10px;
+    }
+    
+    .profile-info strong {
+        color: #495057;
+    }
+    
+    .profile-goal {
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-style: italic;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .profile-actions {
+        text-align: center;
+    }
+    
+    .btn-small {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+    
+    /* Стили пагинации */
+    .pagination {
+        margin: 30px 0;
+        text-align: center;
+    }
+    
+    .pagination-info {
+        margin-bottom: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .btn-pagination {
+        padding: 8px 12px;
+        margin: 0 2px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s;
+    }
+    
+    .btn-pagination:hover {
+        background: #e9ecef;
+        transform: translateY(-1px);
+    }
+    
+    .btn-current {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .btn-current:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: none;
+    }
+</style>
+{% endblock %}

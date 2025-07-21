@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль {{ profile.nickname }} - Сайт знакомств{% endblock %}
+
+{% block content %}
+<div class="profile-view-container">
+    <div class="profile-header">
+        <div class="profile-icon">
+            {% if profile.gender == 'male' %}👨{% else %}👩{% endif %}
+        </div>
+        <div class="profile-title">
+            <h1>{{ profile.nickname }}</h1>
+            <div class="profile-status">
+                {% if profile.is_online %}
+                    <span class="status-online">🟢 Онлайн</span>
+                {% else %}
+                    <span class="status-offline">⚫ Был(а) {{ profile.last_online|date:"d.m.Y в H:i" }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if is_own %}
+            <div class="profile-actions">
+                <a href="{% url 'profiles:edit_profile' %}" class="btn">✏️ Редактировать</a>
+                <a href="/profiles/photos/" class="btn btn-secondary">📷 Фотографии</a>
+            </div>
+        {% else %}
+            <div class="profile-actions">
+                <a href="/profiles/message/{{ profile.user.id }}/" class="btn">💌 Написать сообщение</a>
+                <a href="/profiles/like/{{ profile.id }}/" class="btn btn-secondary">❤️ Нравится</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Фотографии -->
+    {% if photos %}
+        <div class="photos-section">
+            <h3>📷 Фотографии</h3>
+            <div class="photos-grid">
+                {% for photo in photos %}
+                    <div class="photo-item">
+                        <img src="{{ photo.image.url }}" alt="Фото {{ profile.nickname }}" 
+                             onclick="openPhotoModal('{{ photo.image.url }}')"
+                             onerror="this.parentElement.style.display='none';">
+                        {% if photo.is_primary %}
+                            <div class="photo-badge">Главное фото</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="profile-content">
+        <!-- Основная информация -->
+        <div class="info-section">
+            <h3>📝 Основная информация</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Возраст:</strong> {{ profile.age }} лет
+                </div>
+                <div class="info-item">
+                    <strong>Пол:</strong> {{ profile.get_gender_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Город:</strong> {{ profile.get_city_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Рост:</strong> {{ profile.height }} см
+                </div>
+                <div class="info-item">
+                    <strong>Вес:</strong> {{ profile.weight }} кг
+                </div>
+                {% if profile.blood_group %}
+                    <div class="info-item">
+                        <strong>Группа крови:</strong> {{ profile.get_blood_group_display }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Личная информация -->
+        <div class="info-section">
+            <h3>💝 Личная информация</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Ориентация:</strong> {{ profile.get_orientation_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Семейное положение:</strong> {{ profile.get_marital_status_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Образование:</strong> {{ profile.get_education_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Занятость:</strong> {{ profile.get_employment_display }}
+                </div>
+            </div>
+            
+            {% if profile.goal %}
+                <div class="goal-section">
+                    <h4>🎯 Цель знакомства:</h4>
+                    <div class="goal-text">{{ profile.goal }}</div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Образ жизни -->
+        <div class="info-section">
+            <h3>🏃 Образ жизни и здоровье</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Курение:</strong> {{ profile.get_smoking_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Алкоголь:</strong> {{ profile.get_alcohol_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Спорт:</strong> {{ profile.get_sport_display }}
+                </div>
+                <div class="info-item">
+                    <strong>Оценка здоровья:</strong> {{ profile.health_rating }}/10
+                </div>
+                <div class="info-item">
+                    <strong>Хронические заболевания:</strong> 
+                    {% if profile.has_diseases %}Есть{% else %}Нет{% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дополнительная информация для специфических полей -->
+        {% if profile.conception_method or profile.father_contact or profile.payment_approach %}
+            <div class="info-section">
+                <h3>🎯 Специальная информация</h3>
+                <div class="info-grid">
+                    {% if profile.conception_method %}
+                        <div class="info-item">
+                            <strong>Метод зачатия:</strong> {{ profile.get_conception_method_display }}
+                        </div>
+                    {% endif %}
+                    {% if profile.father_contact %}
+                        <div class="info-item">
+                            <strong>Контакт с отцом:</strong> {{ profile.get_father_contact_display }}
+                        </div>
+                    {% endif %}
+                    {% if profile.payment_approach %}
+                        <div class="info-item">
+                            <strong>Подход к оплате:</strong> {{ profile.get_payment_approach_display }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Навигация -->
+    <div class="navigation">
+        <a href="/profiles/search/" class="btn btn-secondary">🔍 Вернуться к поиску</a>
+        <a href="/" class="btn btn-secondary">🏠 На главную</a>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра фотографий -->
+<div id="photoModal" class="modal" onclick="closePhotoModal()">
+    <div class="modal-content">
+        <span class="close" onclick="closePhotoModal()">&times;</span>
+        <img id="modalImage" src="" alt="Фото">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-view-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .profile-icon {
+        font-size: 48px;
+        margin-right: 20px;
+    }
+    
+    .profile-title h1 {
+        color: #333;
+        margin: 0;
+        font-size: 32px;
+    }
+    
+    .profile-status {
+        margin-top: 5px;
+        font-size: 14px;
+    }
+    
+    .status-online {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .status-offline {
+        color: #6c757d;
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .photos-section {
+        margin-bottom: 30px;
+    }
+    
+    .photos-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+    
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .photo-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .photo-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .photo-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .photo-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .info-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .info-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    
+    .info-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .info-item strong {
+        color: #495057;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .goal-section {
+        margin-top: 20px;
+    }
+    
+    .goal-section h4 {
+        color: #495057;
+        margin-bottom: 10px;
+    }
+    
+    .goal-text {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        font-style: italic;
+        line-height: 1.6;
+    }
+    
+    .navigation {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #dee2e6;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 10px;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    /* Модальное окно */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.9);
+    }
+    
+    .modal-content {
+        position: relative;
+        margin: auto;
+        padding: 20px;
+        width: 90%;
+        max-width: 800px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .modal-content img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+    
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        color: white;
+        font-size: 35px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openPhotoModal(imageSrc) {
+        document.getElementById('photoModal').style.display = 'block';
+        document.getElementById('modalImage').src = imageSrc;
+    }
+    
+    function closePhotoModal() {
+        document.getElementById('photoModal').style.display = 'none';
+    }
+    
+    // Закрытие модального окна по клавише Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closePhotoModal();
+        }
+    });
+</script>
+{% endblock %}

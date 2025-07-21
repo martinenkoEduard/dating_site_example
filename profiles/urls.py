@@ -16,7 +16,7 @@ urlpatterns = [
     path('profiles/edit/', profile_views.edit_profile, name='edit_profile'),
     path('profiles/view/<int:profile_id>/', profile_views.view_profile, name='view_profile'),
     path('profiles/search/', profile_views.search_profiles, name='search_profiles'),
-    path('profiles/advanced-search/', profile_views.advanced_search_profiles, name='advanced_search_profiles'),
+    # path('profiles/advanced-search/', profile_views.advanced_search_profiles, name='advanced_search_profiles'),
     
     # Управление фотографиями
     path('profiles/photos/', photo_views.manage_photos, name='manage_photos'),

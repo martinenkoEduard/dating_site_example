@@ -31,7 +31,6 @@
                     {% if user.is_authenticated %}
                         <a href="/profiles/">🏠 Главная</a>
                         <a href="/profiles/search/">🔍 Поиск</a>
-                        <a href="/profiles/advanced-search/">🔍+ Расширенный поиск</a>
                         <a href="/profiles/conversations/">💬 Сообщения</a>
                         {% if has_profile %}
                             <a href="/profiles/my/">👤 Мой профиль</a>
@@ -76,4 +75,4 @@
 
     {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>
