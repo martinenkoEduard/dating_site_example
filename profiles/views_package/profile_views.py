@@ -208,9 +208,113 @@ def search_profiles(request):
         if data.get('alcohol'):
             profiles = profiles.filter(alcohol=data['alcohol'])
         
-        # Фильтр по наличию детей
-        if data.get('has_children') is not None:
-            profiles = profiles.filter(has_children=data['has_children'])
+        # ИСПРАВЛЕННЫЙ фильтр по наличию детей
+        has_children_str = data.get('has_children')
+        if has_children_str:  # Если выбрано что-то кроме пустой строки
+            if has_children_str == 'true':
+                profiles = profiles.filter(has_children=True)
+            elif has_children_str == 'false':
+                profiles = profiles.filter(has_children=False)
+        
+        # Фильтр по поиску
+        if data.get('search'):
+            search_query = data['search'].strip()
+            if search_query:
+                profiles = profiles.filter(
+                    Q(nickname__icontains=search_query) |
+                    Q(goal__icontains=search_query)
+                )
+    
+    # Подсчитываем общее количество
+    total_count = profiles.count()
+    
+    # Применяем пагинацию
+    paginator = Paginator(profiles, 12)
+    page_number = request.GET.get('page', 1)
+    
+    try:
+        page_obj = paginator.get_page(page_number)
+    except (PageNotAnInteger, EmptyPage):
+        page_obj = paginator.get_page(1)
+    
+    context = {
+        'form': form,
+        'page_obj': page_obj,
+        'total_count': total_count,
+        'profiles': page_obj.object_list
+    }
+    
+    return render(request, 'profiles/search_results.html', context)
+
+    """Поиск профилей с кэшированием результатов"""
+    try:
+        own_profile = get_cached_user_profile(request.user)
+    except Profile.DoesNotExist:
+        messages.info(request, 'Сначала создайте свой профиль!')
+        return redirect('profiles:create_profile')
+    
+    if not own_profile:
+        messages.info(request, 'Сначала создайте свой профиль!')
+        return redirect('profiles:create_profile')
+    
+    form = ProfileSearchForm(request.GET or None)
+    
+    # Выполняем поиск
+    profiles = Profile.objects.search_optimized(exclude_user=request.user)
+    
+    # Применяем фильтры если форма валидна
+    if form.is_valid():
+        data = form.cleaned_data
+        
+        # Фильтр по полу
+        if data.get('gender'):
+            profiles = profiles.filter(gender=data['gender'])
+        
+        # Фильтр по возрасту
+        if data.get('age_min'):
+            profiles = profiles.filter(age__gte=data['age_min'])
+        if data.get('age_max'):
+            profiles = profiles.filter(age__lte=data['age_max'])
+        
+        # Фильтр по росту
+        if data.get('height_min'):
+            profiles = profiles.filter(height__gte=data['height_min'])
+        if data.get('height_max'):
+            profiles = profiles.filter(height__lte=data['height_max'])
+        
+        # Фильтр по городу
+        if data.get('city'):
+            profiles = profiles.filter(city=data['city'])
+        
+        # Фильтр по образованию
+        if data.get('education'):
+            profiles = profiles.filter(education=data['education'])
+        
+        # Фильтр по занятости
+        if data.get('employment'):
+            profiles = profiles.filter(employment=data['employment'])
+        
+        # Фильтр по курению
+        if data.get('smoking'):
+            profiles = profiles.filter(smoking=data['smoking'])
+        
+        # Фильтр по алкоголю
+        if data.get('alcohol'):
+            profiles = profiles.filter(alcohol=data['alcohol'])
+        
+        # ИСПРАВЛЕННЫЙ фильтр по наличию детей
+        has_children = data.get('has_children')
+        if has_children is not None:  # Проверяем что значение не None
+            profiles = profiles.filter(has_children=has_children)
+        
+        # Фильтр по поиску
+        if data.get('search'):
+            search_query = data['search'].strip()
+            if search_query:
+                profiles = profiles.filter(
+                    Q(nickname__icontains=search_query) |
+                    Q(goal__icontains=search_query)
+                )
     
     # Подсчитываем общее количество
     total_count = profiles.count()

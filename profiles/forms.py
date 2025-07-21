@@ -449,8 +449,14 @@ class ProfileSearchForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
+    # ИСПРАВЛЕННОЕ ПОЛЕ - используем строковые значения
     has_children = forms.ChoiceField(
-        choices=[('', 'Не важно'), ('True', 'Есть дети'), ('False', 'Нет детей')],
+        label='Наличие детей',
+        choices=[
+            ('', 'Не важно'),
+            ('true', 'Есть дети'),
+            ('false', 'Нет детей')
+        ],
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
@@ -480,7 +486,8 @@ class ProfileSearchForm(forms.Form):
         if height_min and height_max and height_min > height_max:
             raise forms.ValidationError('Минимальный рост не может быть больше максимального')
         
-        return cleaned_data 
+        return cleaned_data
+
 
 
 class AdvancedProfileSearchForm(forms.Form):
