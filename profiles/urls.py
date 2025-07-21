@@ -1,19 +1,20 @@
 from django.urls import path
 from . import views
+from .views_package import profile_views
 
 app_name = 'profiles'
 
 urlpatterns = [
     # Главная страница
-    path('', views.home, name='home'),
+    path('', profile_views.home, name='home'),
     
     # Управление профилем
-    path('profiles/create/', views.create_profile, name='create_profile'),
-    path('profiles/my/', views.my_profile, name='my_profile'),
-    path('profiles/edit/', views.edit_profile, name='edit_profile'),
-    path('profiles/view/<int:profile_id>/', views.view_profile, name='view_profile'),
-    path('profiles/search/', views.search_profiles, name='search_profiles'),
-    path('profiles/advanced-search/', views.advanced_search_profiles, name='advanced_search_profiles'),
+    path('profiles/create/', profile_views.create_profile, name='create_profile'),
+    path('profiles/my/', profile_views.my_profile, name='my_profile'),
+    path('profiles/edit/', profile_views.edit_profile, name='edit_profile'),
+    path('profiles/view/<int:profile_id>/', profile_views.view_profile, name='view_profile'),
+    path('profiles/search/', profile_views.search_profiles, name='search_profiles'),
+    path('profiles/advanced-search/', profile_views.advanced_search_profiles, name='advanced_search_profiles'),
     
     # Управление фотографиями
     path('profiles/photos/', views.manage_photos, name='manage_photos'),
