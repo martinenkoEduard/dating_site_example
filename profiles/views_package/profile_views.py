@@ -57,7 +57,26 @@ def create_profile(request):
             messages.success(request, 'Профиль успешно создан!')
             return redirect('profiles:my_profile')
         else:
-            messages.error(request, 'Ошибки в форме. Проверьте введенные данные.')
+            # Собираем все ошибки формы в одно сообщение
+            error_messages = []
+            
+            # Добавляем ошибки полей
+            for field, errors in form.errors.items():
+                field_label = form.fields[field].label or field
+                for error in errors:
+                    error_messages.append(f"{field_label}: {error}")
+            
+            # Добавляем общие ошибки формы (non_field_errors)
+            if form.non_field_errors():
+                for error in form.non_field_errors():
+                    error_messages.append(error)
+            
+            # Отображаем все ошибки
+            if error_messages:
+                for error_msg in error_messages:
+                    messages.error(request, error_msg)
+            else:
+                messages.error(request, 'Ошибки в форме. Проверьте введенные данные.')
     else:
         form = ProfileForm()
     
