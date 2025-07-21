@@ -18,7 +18,7 @@ from django import forms
 import os
 
 from ..models import Profile
-from ..forms import ProfileForm, ProfileSearchForm, AdvancedProfileSearchForm
+from ..forms_package import ProfileForm, ProfileSearchForm
 from ..cache_utils import (
     get_cached_user_profile, invalidate_user_profile_cache,
     get_cached_profile_stats, get_cached_recent_profiles,

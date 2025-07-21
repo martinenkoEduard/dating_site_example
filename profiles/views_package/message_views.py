@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ..models import Profile, Conversation, Message, MessageLimit, Report
-from ..forms import MessageForm, ReportForm
+from ..forms_package import MessageForm, ReportForm
 from ..cache_utils import (
     get_cached_user_profile, get_cached_conversation_list, 
     cache_conversation_list, invalidate_conversation_cache,
