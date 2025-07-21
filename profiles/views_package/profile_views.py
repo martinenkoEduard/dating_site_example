@@ -98,7 +98,7 @@ def my_profile(request):
         return redirect('profiles:create_profile')
     
     # Получаем все фотографии профиля
-    photos = profile.photos.filter(is_verified=True).order_by('-is_primary', '-uploaded_at')
+    photos = profile.photos.filter(is_verified=True).order_by('-is_primary', '-created_at')
     
     context = {
         'profile': profile,
@@ -152,7 +152,7 @@ def view_profile(request, profile_id):
         profile = get_object_or_404(Profile, id=profile_id)
         
         # Получаем все фотографии профиля
-        photos = profile.photos.filter(is_verified=True).order_by('-is_primary', '-uploaded_at')
+        photos = profile.photos.filter(is_verified=True).order_by('-is_primary', '-created_at')
         
         context = {
             'profile': profile,

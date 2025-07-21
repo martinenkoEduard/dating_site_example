@@ -1,14 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
-
-from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.core.management import call_command
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.db.utils import OperationalError
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -17,7 +12,7 @@ from django.conf import settings
 from django import forms
 import os
 
-from ..models import Profile
+from ..models import Profile, Photo
 from ..forms_package import ProfileForm, ProfileSearchForm
 from ..cache_utils import (
     get_cached_user_profile, invalidate_user_profile_cache,
@@ -35,7 +30,8 @@ def manage_photos(request):
         messages.info(request, 'Сначала создайте профиль!')
         return redirect('profiles:create_profile')
     
-    photos = profile.photos.all().order_by('-is_primary', '-uploaded_at')
+    # Исправлено: используем created_at вместо uploaded_at
+    photos = profile.photos.all().order_by('-is_primary', '-created_at')
     
     # Статистика
     photos_count = photos.count()
@@ -62,18 +58,24 @@ def upload_photo(request):
         return redirect('profiles:create_profile')
     
     if request.method == 'POST':
-        form = PhotoUploadForm(request.POST, request.FILES, profile=profile)
-        if form.is_valid():
-            photo = form.save()
-            messages.success(request, 'Фотография успешно загружена!')
-            return redirect('profiles:manage_photos')
+        # Здесь нужно будет создать форму PhotoUploadForm
+        # Пока что простая обработка
+        if 'image' in request.FILES:
+            try:
+                photo = Photo.objects.create(
+                    profile=profile,
+                    image=request.FILES['image'],
+                    is_primary=(not profile.photos.exists()),
+                    is_verified=True
+                )
+                messages.success(request, 'Фотография успешно загружена!')
+                return redirect('profiles:manage_photos')
+            except Exception as e:
+                messages.error(request, f'Ошибка при загрузке фотографии: {str(e)}')
         else:
-            messages.error(request, 'Ошибки при загрузке фотографии. Проверьте данные.')
-    else:
-        form = PhotoUploadForm(profile=profile)
+            messages.error(request, 'Выберите файл для загрузки.')
     
     context = {
-        'form': form,
         'title': 'Загрузка фотографии',
         'single': True,
         'profile': profile,
@@ -92,9 +94,8 @@ def upload_multiple_photos(request):
         return redirect('profiles:create_profile')
     
     if request.method == 'POST':
-        form = MultiplePhotoUploadForm(request.POST, request.FILES, profile=profile)
-        if form.is_valid():
-            files = form.cleaned_data['images']
+        files = request.FILES.getlist('images')
+        if files:
             uploaded_count = 0
             
             for file in files:
@@ -102,7 +103,7 @@ def upload_multiple_photos(request):
                     photo = Photo.objects.create(
                         profile=profile,
                         image=file,
-                        is_primary=(not profile.photos.exists()),
+                        is_primary=(not profile.photos.exists() and uploaded_count == 0),
                         is_verified=True
                     )
                     uploaded_count += 1
@@ -113,12 +114,9 @@ def upload_multiple_photos(request):
                 messages.success(request, f'Успешно загружено {uploaded_count} фотографий!')
             return redirect('profiles:manage_photos')
         else:
-            messages.error(request, 'Ошибки при загрузке фотографий. Проверьте данные.')
-    else:
-        form = MultiplePhotoUploadForm(profile=profile)
+            messages.error(request, 'Выберите файлы для загрузки.')
     
     context = {
-        'form': form,
         'title': 'Загрузка нескольких фотографий',
         'single': False,
         'profile': profile,

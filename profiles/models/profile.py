@@ -46,8 +46,8 @@ class ProfileManager(BaseManager):
         from django.db.models import Count, Q
         return self.aggregate(
             total=Count('id'),
-            male=Count('id', filter=Q(gender='male')),
-            female=Count('id', filter=Q(gender='female'))
+            male=Count('id', filter=Q(gender=1)),
+            female=Count('id', filter=Q(gender=2))
         )
 
 
@@ -68,112 +68,112 @@ class Profile(TimestampedModel, ActiveModel):
     
     # Выборы для полей
     GENDER_CHOICES = [
-        ('male', 'Мужской'),
-        ('female', 'Женский'),
+        (1, 'Мужской'),
+        (2, 'Женский'),
     ]
     
     ORIENTATION_CHOICES = [
-        ('traditional', 'Традиционная'),
-        ('non_traditional', 'Нетрадиционная'),
-        ('any', 'Любая'),
+        (1, 'Традиционная'),
+        (2, 'Нетрадиционная'),
+        (3, 'Любая'),
     ]
     
     MARITAL_STATUS_CHOICES = [
-        ('single', 'Не в браке'),
-        ('married', 'В браке'),
-        ('divorced', 'Разведен'),
-        ('widowed', 'Вдовец'),
+        (1, 'Не в браке'),
+        (2, 'В браке'),
+        (3, 'Разведен'),
+        (4, 'Вдовец'),
     ]
     
     EDUCATION_CHOICES = [
-        ('higher', 'Высшее'),
-        ('secondary', 'Среднее'),
-        ('specialized', 'Среднее специальное'),
+        (1, 'Высшее'),
+        (2, 'Среднее'),
+        (3, 'Среднее специальное'),
     ]
     
     EMPLOYMENT_CHOICES = [
-        ('employed', 'Имею работу'),
-        ('unemployed', 'Безработный'),
-        ('student', 'Студент'),
+        (1, 'Имею работу'),
+        (2, 'Безработный'),
+        (3, 'Студент'),
     ]
     
     SMOKING_CHOICES = [
-        ('no', 'Не курю'),
-        ('yes', 'Курю'),
-        ('quit', 'Бросил'),
+        (1, 'Не курю'),
+        (2, 'Курю'),
+        (3, 'Бросил'),
     ]
     
     ALCOHOL_CHOICES = [
-        ('no', 'Не пью'),
-        ('rarely', 'Крайне редко'),
-        ('moderate', 'Умеренно'),
+        (1, 'Не пью'),
+        (2, 'Крайне редко'),
+        (3, 'Умеренно'),
     ]
     
     SPORT_CHOICES = [
-        ('active', 'Занимаюсь'),
-        ('inactive', 'Не занимаюсь'),
-        ('sometimes', 'Время от времени'),
+        (1, 'Занимаюсь'),
+        (2, 'Не занимаюсь'),
+        (3, 'Время от времени'),
     ]
     
     BLOOD_GROUP_CHOICES = [
-        ('I+', 'I положительная'),
-        ('I-', 'I отрицательная'),
-        ('II+', 'II положительная'),
-        ('II-', 'II отрицательная'),
-        ('III+', 'III положительная'),
-        ('III-', 'III отрицательная'),
-        ('IV+', 'IV положительная'),
-        ('IV-', 'IV отрицательная'),
+        (1, 'I положительная'),
+        (2, 'I отрицательная'),
+        (3, 'II положительная'),
+        (4, 'II отрицательная'),
+        (5, 'III положительная'),
+        (6, 'III отрицательная'),
+        (7, 'IV положительная'),
+        (8, 'IV отрицательная'),
     ]
     
     CONCEPTION_METHOD_CHOICES = [
-        ('agreement', 'По договоренности'),
-        ('other', 'Другое'),
+        (1, 'По договоренности'),
+        (2, 'Другое'),
     ]
     
     CONTACT_CHOICES = [
-        ('not_important', 'Не важно'),
-        ('important', 'Важно'),
+        (1, 'Не важно'),
+        (2, 'Важно'),
     ]
     
     PAYMENT_CHOICES = [
-        ('no_payment', 'Без оплаты'),
-        ('with_payment', 'С оплатой'),
+        (1, 'Без оплаты'),
+        (2, 'С оплатой'),
     ]
     
     APPEARANCE_CHOICES = [
-        ('european_light', 'Европейский светлый'),
-        ('south_european', 'Южно-европейский слегка смуглый'),
-        ('swarthy_asian', 'Смуглый азиатский'),
-        ('mongoloid', 'Желтый монголоидный'),
-        ('latin_american', 'Латиноамериканский'),
-        ('negroid', 'Негроидный'),
+        (1, 'Европейский светлый'),
+        (2, 'Южно-европейский слегка смуглый'),
+        (3, 'Смуглый азиатский'),
+        (4, 'Желтый монголоидный'),
+        (5, 'Латиноамериканский'),
+        (6, 'Негроидный'),
     ]
     
     CITY_CHOICES = [
-        ('moscow', 'Москва'),
-        ('spb', 'Санкт-Петербург'),
-        ('novosibirsk', 'Новосибирск'),
-        ('ekaterinburg', 'Екатеринбург'),
-        ('kazan', 'Казань'),
-        ('nizhny_novgorod', 'Нижний Новгород'),
-        ('chelyabinsk', 'Челябинск'),
-        ('samara', 'Самара'),
-        ('omsk', 'Омск'),
-        ('rostov_on_don', 'Ростов-на-Дону'),
-        ('ufa', 'Уфа'),
-        ('krasnoyarsk', 'Красноярск'),
-        ('voronezh', 'Воронеж'),
-        ('perm', 'Пермь'),
-        ('volgograd', 'Волгоград'),
+        (1, 'Москва'),
+        (2, 'Санкт-Петербург'),
+        (3, 'Новосибирск'),
+        (4, 'Екатеринбург'),
+        (5, 'Казань'),
+        (6, 'Нижний Новгород'),
+        (7, 'Челябинск'),
+        (8, 'Самара'),
+        (9, 'Омск'),
+        (10, 'Ростов-на-Дону'),
+        (11, 'Уфа'),
+        (12, 'Красноярск'),
+        (13, 'Воронеж'),
+        (14, 'Пермь'),
+        (15, 'Волгоград'),
     ]
     
     LOOKING_FOR_CHOICES = [
-        ('straight_women', 'Женщин-натуралок'),
-        ('lesbian_women', 'Женщин-лесбиянок'),
-        ('woman_woman_pairs', 'Пар женщина-женщина'),
-        ('man_woman_pairs', 'Пар мужчина-женщина'),
-        ('any', 'Любых'),
+        (1, 'Женщин-натуралок'),
+        (2, 'Женщин-лесбиянок'),
+        (3, 'Пар женщина-женщина'),
+        (4, 'Пар мужчина-женщина'),
+        (5, 'Любых'),
     ]
 
     # Связь с пользователем
@@ -184,39 +184,39 @@ class Profile(TimestampedModel, ActiveModel):
     age = models.PositiveIntegerField('Возраст', validators=[MinValueValidator(18), MaxValueValidator(100)])
     height = models.PositiveIntegerField('Рост (см)', validators=[MinValueValidator(100), MaxValueValidator(250)])
     weight = models.PositiveIntegerField('Вес (кг)', validators=[MinValueValidator(30), MaxValueValidator(300)])
-    blood_group = models.CharField('Группа крови', max_length=10, choices=BLOOD_GROUP_CHOICES)
-    gender = models.CharField('Пол', max_length=10, choices=GENDER_CHOICES)
-    city = models.CharField('Город', max_length=50, choices=CITY_CHOICES)
+    blood_group = models.IntegerField('Группа крови', choices=BLOOD_GROUP_CHOICES)
+    gender = models.IntegerField('Пол', choices=GENDER_CHOICES)
+    city = models.IntegerField('Город', choices=CITY_CHOICES)
     
     # Личная информация
-    orientation = models.CharField('Сексуальная ориентация', max_length=20, choices=ORIENTATION_CHOICES)
-    marital_status = models.CharField('Семейное положение', max_length=20, choices=MARITAL_STATUS_CHOICES)
+    orientation = models.IntegerField('Сексуальная ориентация', choices=ORIENTATION_CHOICES)
+    marital_status = models.IntegerField('Семейное положение', choices=MARITAL_STATUS_CHOICES)
     goal = models.TextField('Цель поиска', default='Найти партнера для зачатия')
-    education = models.CharField('Образование', max_length=20, choices=EDUCATION_CHOICES)
-    employment = models.CharField('Занятость', max_length=20, choices=EMPLOYMENT_CHOICES)
+    education = models.IntegerField('Образование', choices=EDUCATION_CHOICES)
+    employment = models.IntegerField('Занятость', choices=EMPLOYMENT_CHOICES)
     
     # Привычки и здоровье
-    smoking = models.CharField('Отношение к курению', max_length=10, choices=SMOKING_CHOICES)
-    alcohol = models.CharField('Отношение к алкоголю', max_length=20, choices=ALCOHOL_CHOICES)
-    sport = models.CharField('Отношение к спорту', max_length=20, choices=SPORT_CHOICES)
+    smoking = models.IntegerField('Отношение к курению', choices=SMOKING_CHOICES)
+    alcohol = models.IntegerField('Отношение к алкоголю', choices=ALCOHOL_CHOICES)
+    sport = models.IntegerField('Отношение к спорту', choices=SPORT_CHOICES)
     health_rating = models.PositiveIntegerField('Оценка здоровья', validators=[MinValueValidator(1), MaxValueValidator(10)])
     has_diseases = models.BooleanField('ВИЧ-инфекция, гепатит', default=False)
     
     # Представления о зачатии
-    conception_method = models.CharField('Способ зачатия', max_length=20, choices=CONCEPTION_METHOD_CHOICES)
-    father_contact = models.CharField('Контакт с ребенком', max_length=20, choices=CONTACT_CHOICES)
-    payment_approach = models.CharField('Оплата', max_length=20, choices=PAYMENT_CHOICES)
+    conception_method = models.IntegerField('Способ зачатия', choices=CONCEPTION_METHOD_CHOICES)
+    father_contact = models.IntegerField('Контакт с ребенком', choices=CONTACT_CHOICES)
+    payment_approach = models.IntegerField('Оплата', choices=PAYMENT_CHOICES)
     
     # Желаемые данные партнера
-    looking_for = models.CharField('Ищу среди', max_length=30, choices=LOOKING_FOR_CHOICES)
+    looking_for = models.IntegerField('Ищу среди', choices=LOOKING_FOR_CHOICES)
     desired_age_min = models.PositiveIntegerField('Желаемый возраст от', null=True, blank=True)
     desired_age_max = models.PositiveIntegerField('Желаемый возраст до', null=True, blank=True)
     desired_height_min = models.PositiveIntegerField('Желаемый рост от', null=True, blank=True)
     desired_height_max = models.PositiveIntegerField('Желаемый рост до', null=True, blank=True)
     desired_weight_min = models.PositiveIntegerField('Желаемый вес от', null=True, blank=True)
     desired_weight_max = models.PositiveIntegerField('Желаемый вес до', null=True, blank=True)
-    desired_appearance = models.CharField('Тип внешности', max_length=30, choices=APPEARANCE_CHOICES, blank=True)
-    desired_city = models.CharField('Желаемый город', max_length=50, choices=CITY_CHOICES, blank=True)
+    desired_appearance = models.IntegerField('Тип внешности', choices=APPEARANCE_CHOICES, null=True, blank=True)
+    desired_city = models.IntegerField('Желаемый город', choices=CITY_CHOICES, null=True, blank=True)
     
     # Дополнительные параметры
     has_children = models.BooleanField('Наличие детей', default=False)

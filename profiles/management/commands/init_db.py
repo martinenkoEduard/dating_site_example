@@ -83,19 +83,19 @@ class Command(BaseCommand):
                 'age': 25,
                 'height': 180,
                 'weight': 75,
-                'city': 'moscow',
-                'education': 'higher',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 1,  # Москва
+                'education': 1,  # Высшее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Ищу серьезные отношения для создания семьи. Важна взаимная поддержка и понимание.',
-                'smoking': 'no',
-                'alcohol': 'rarely',
-                'sport': 'regularly',
+                'smoking': 1,  # Не курю
+                'alcohol': 2,  # Крайне редко
+                'sport': 1,  # Занимаюсь
                 'health_rating': 9,
-                'conception_method': 'agreement',
-                'father_contact': 'regular',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 20,
                 'desired_age_max': 30,
                 'desired_height_min': 160,
@@ -108,19 +108,19 @@ class Command(BaseCommand):
                 'age': 30,
                 'height': 175,
                 'weight': 80,
-                'city': 'spb',
-                'education': 'higher',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'divorced',
+                'city': 2,  # Санкт-Петербург
+                'education': 1,  # Высшее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 3,  # Разведен
                 'goal': 'Хочу найти партнершу для рождения детей. Готов к долгосрочным отношениям.',
-                'smoking': 'occasionally',
-                'alcohol': 'socially',
-                'sport': 'sometimes',
+                'smoking': 3,  # Бросил
+                'alcohol': 3,  # Умеренно
+                'sport': 3,  # Время от времени
                 'health_rating': 8,
-                'conception_method': 'natural',
-                'father_contact': 'important',
-                'payment_approach': 'full_support',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 2,  # С оплатой
                 'desired_age_min': 25,
                 'desired_age_max': 35,
                 'desired_height_min': 165,
@@ -134,19 +134,19 @@ class Command(BaseCommand):
                 'age': 35,
                 'height': 185,
                 'weight': 85,
-                'city': 'novosibirsk',
-                'education': 'specialized',
-                'employment': 'entrepreneur',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 3,  # Новосибирск
+                'education': 3,  # Среднее специальное
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Ищу женщину для создания большой и счастливой семьи. Ценю честность и открытость.',
-                'smoking': 'no',
-                'alcohol': 'no',
-                'sport': 'regularly',
+                'smoking': 1,  # Не курю
+                'alcohol': 1,  # Не пью
+                'sport': 1,  # Занимаюсь
                 'health_rating': 10,
-                'conception_method': 'agreement',
-                'father_contact': 'very_important',
-                'payment_approach': 'full_support',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 2,  # С оплатой
                 'desired_age_min': 22,
                 'desired_age_max': 32,
                 'desired_height_min': 160,
@@ -159,19 +159,19 @@ class Command(BaseCommand):
                 'age': 28,
                 'height': 178,
                 'weight': 78,
-                'city': 'ekaterinburg',
-                'education': 'higher',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 4,  # Екатеринбург
+                'education': 1,  # Высшее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Мечтаю о семье с детьми. Готов взять на себя ответственность за будущее семьи.',
-                'smoking': 'no',
-                'alcohol': 'rarely',
-                'sport': 'sometimes',
+                'smoking': 1,  # Не курю
+                'alcohol': 2,  # Крайне редко
+                'sport': 3,  # Время от времени
                 'health_rating': 8,
-                'conception_method': 'natural',
-                'father_contact': 'regular',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 23,
                 'desired_age_max': 33,
                 'desired_height_min': 160,
@@ -184,19 +184,19 @@ class Command(BaseCommand):
                 'age': 32,
                 'height': 182,
                 'weight': 82,
-                'city': 'kazan',
-                'education': 'secondary',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 5,  # Казань
+                'education': 2,  # Среднее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Хочу стать отцом и создать крепкую семью. Ценю традиционные ценности.',
-                'smoking': 'occasionally',
-                'alcohol': 'socially',
-                'sport': 'regularly',
+                'smoking': 3,  # Бросил
+                'alcohol': 3,  # Умеренно
+                'sport': 1,  # Занимаюсь
                 'health_rating': 9,
-                'conception_method': 'agreement',
-                'father_contact': 'important',
-                'payment_approach': 'full_support',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 2,  # С оплатой
                 'desired_age_min': 24,
                 'desired_age_max': 35,
                 'desired_height_min': 165,
@@ -213,19 +213,19 @@ class Command(BaseCommand):
                 'age': 23,
                 'height': 165,
                 'weight': 55,
-                'city': 'moscow',
-                'education': 'higher',
-                'employment': 'student',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 1,  # Москва
+                'education': 1,  # Высшее
+                'employment': 3,  # Студент
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Мечтаю о материнстве и крепкой семье. Ищу надежного партнера для совместного будущего.',
-                'smoking': 'no',
-                'alcohol': 'no',
-                'sport': 'regularly',
+                'smoking': 1,  # Не курю
+                'alcohol': 1,  # Не пью
+                'sport': 1,  # Занимаюсь
                 'health_rating': 10,
-                'conception_method': 'natural',
-                'father_contact': 'very_important',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 25,
                 'desired_age_max': 35,
                 'desired_height_min': 175,
@@ -238,19 +238,19 @@ class Command(BaseCommand):
                 'age': 27,
                 'height': 170,
                 'weight': 60,
-                'city': 'spb',
-                'education': 'higher',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 2,  # Санкт-Петербург
+                'education': 1,  # Высшее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Готова к серьезным отношениям и созданию семьи. Важна эмоциональная связь.',
-                'smoking': 'no',
-                'alcohol': 'rarely',
-                'sport': 'sometimes',
+                'smoking': 1,  # Не курю
+                'alcohol': 2,  # Крайне редко
+                'sport': 3,  # Время от времени
                 'health_rating': 9,
-                'conception_method': 'natural',
-                'father_contact': 'important',
-                'payment_approach': 'full_support',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 2,  # С оплатой
                 'desired_age_min': 28,
                 'desired_age_max': 40,
                 'desired_height_min': 175,
@@ -263,19 +263,19 @@ class Command(BaseCommand):
                 'age': 31,
                 'height': 168,
                 'weight': 58,
-                'city': 'novosibirsk',
-                'education': 'specialized',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'divorced',
+                'city': 3,  # Новосибирск
+                'education': 3,  # Среднее специальное
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 3,  # Разведена
                 'goal': 'Хочу второй шанс на счастье в материнстве. Ищу понимающего мужчину.',
-                'smoking': 'no',
-                'alcohol': 'socially',
-                'sport': 'regularly',
+                'smoking': 1,  # Не курю
+                'alcohol': 3,  # Умеренно
+                'sport': 1,  # Занимаюсь
                 'health_rating': 8,
-                'conception_method': 'agreement',
-                'father_contact': 'regular',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 30,
                 'desired_age_max': 42,
                 'desired_height_min': 175,
@@ -289,19 +289,19 @@ class Command(BaseCommand):
                 'age': 26,
                 'height': 172,
                 'weight': 62,
-                'city': 'ekaterinburg',
-                'education': 'higher',
-                'employment': 'student',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 4,  # Екатеринбург
+                'education': 1,  # Высшее
+                'employment': 3,  # Студент
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Стремлюсь к материнству и семейному счастью. Ценю честность и верность.',
-                'smoking': 'no',
-                'alcohol': 'rarely',
-                'sport': 'sometimes',
+                'smoking': 1,  # Не курю
+                'alcohol': 2,  # Крайне редко
+                'sport': 3,  # Время от времени
                 'health_rating': 9,
-                'conception_method': 'natural',
-                'father_contact': 'very_important',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 26,
                 'desired_age_max': 36,
                 'desired_height_min': 178,
@@ -314,19 +314,19 @@ class Command(BaseCommand):
                 'age': 29,
                 'height': 166,
                 'weight': 57,
-                'city': 'kazan',
-                'education': 'higher',
-                'employment': 'employed',
-                'orientation': 'traditional',
-                'marital_status': 'single',
+                'city': 5,  # Казань
+                'education': 1,  # Высшее
+                'employment': 1,  # Имею работу
+                'orientation': 1,  # Традиционная
+                'marital_status': 1,  # Не в браке
                 'goal': 'Мечтаю стать мамой и найти спутника жизни. Важна взаимная поддержка.',
-                'smoking': 'no',
-                'alcohol': 'rarely',
-                'sport': 'regularly',
+                'smoking': 1,  # Не курю
+                'alcohol': 2,  # Крайне редко
+                'sport': 1,  # Занимаюсь
                 'health_rating': 10,
-                'conception_method': 'natural',
-                'father_contact': 'important',
-                'payment_approach': 'shared_expenses',
+                'conception_method': 1,  # По договоренности
+                'father_contact': 2,  # Важно
+                'payment_approach': 1,  # Без оплаты
                 'desired_age_min': 27,
                 'desired_age_max': 38,
                 'desired_height_min': 175,
@@ -353,8 +353,8 @@ class Command(BaseCommand):
                         age=profile_data['age'],
                         height=profile_data['height'],
                         weight=profile_data['weight'],
-                        blood_group=random.choice(['I+', 'II+', 'III+', 'IV+', 'I-', 'II-']),
-                        gender='male',
+                        blood_group=random.randint(1, 8),  # Случайная группа крови
+                        gender=1,  # Мужской
                         city=profile_data['city'],
                         orientation=profile_data['orientation'],
                         marital_status=profile_data['marital_status'],
@@ -369,12 +369,12 @@ class Command(BaseCommand):
                         conception_method=profile_data['conception_method'],
                         father_contact=profile_data['father_contact'],
                         payment_approach=profile_data['payment_approach'],
-                        looking_for='straight_women',
+                        looking_for=1,  # Женщин-натуралок
                         desired_age_min=profile_data['desired_age_min'],
                         desired_age_max=profile_data['desired_age_max'],
                         desired_height_min=profile_data.get('desired_height_min'),
                         desired_height_max=profile_data.get('desired_height_max'),
-                        desired_appearance='european_light',
+                        desired_appearance=1,  # Европейский светлый
                         has_children=profile_data.get('has_children', False),
                         photo_required=True,
                         last_online=timezone.now() - timezone.timedelta(hours=random.randint(1, 48)),
@@ -404,8 +404,8 @@ class Command(BaseCommand):
                         age=profile_data['age'],
                         height=profile_data['height'],
                         weight=profile_data['weight'],
-                        blood_group=random.choice(['I+', 'II+', 'III+', 'IV+', 'I-', 'II-']),
-                        gender='female',
+                        blood_group=random.randint(1, 8),  # Случайная группа крови
+                        gender=2,  # Женский
                         city=profile_data['city'],
                         orientation=profile_data['orientation'],
                         marital_status=profile_data['marital_status'],
@@ -420,12 +420,12 @@ class Command(BaseCommand):
                         conception_method=profile_data['conception_method'],
                         father_contact=profile_data['father_contact'],
                         payment_approach=profile_data['payment_approach'],
-                        looking_for='straight_men',
+                        looking_for=1,  # Можно изменить на другие варианты
                         desired_age_min=profile_data['desired_age_min'],
                         desired_age_max=profile_data['desired_age_max'],
                         desired_height_min=profile_data.get('desired_height_min'),
                         desired_height_max=profile_data.get('desired_height_max'),
-                        desired_appearance='european_light',
+                        desired_appearance=1,  # Европейский светлый
                         has_children=profile_data.get('has_children', False),
                         photo_required=True,
                         last_online=timezone.now() - timezone.timedelta(hours=random.randint(1, 48)),
@@ -506,8 +506,7 @@ class Command(BaseCommand):
                             photo = Photo.objects.create(
                                 profile=profile,
                                 is_primary=(i == 0),
-                                is_verified=True,
-                                uploaded_at=timezone.now() - timezone.timedelta(days=random.randint(1, 30))
+                                is_verified=True
                             )
                             
                             # Сохраняем файл
@@ -533,4 +532,4 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 self.style.WARNING(f'Could not create test photos: {str(e)}')
-            ) 
+            )
