@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Сайт знакомств{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .form-check-input {
+        margin-right: 10px;
+    }
+    
+    .btn {
+        padding: 14px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        margin-right: 10px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .buttons {
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    .help-text {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .requirements {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .requirements h4 {
+        margin-top: 0;
+        color: #495057;
+    }
+    
+    .requirements ul {
+        margin-bottom: 0;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0;
+    }
+    
+    .errorlist li {
+        color: #721c24;
+        font-size: 14px;
+        background: #f8d7da;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <h1>📤 {{ title }}</h1>
+    
+    <div class="requirements">
+        <h4>📋 Требования к фотографиям:</h4>
+        <ul>
+            <li>✅ Форматы: JPG, JPEG, PNG, GIF, WEBP</li>
+            <li>✅ Максимальный размер: 5MB на файл</li>
+            <li>✅ Минимальное разрешение: 200x200 пикселей</li>
+            <li>✅ Максимальное разрешение: 4000x4000 пикселей</li>
+            <li>✅ Максимум 10 фотографий на профиль</li>
+            {% if not single %}
+                <li>✅ Можно загрузить до 5 фотографий за раз</li>
+            {% endif %}
+        </ul>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                
+                {% if field.name == 'is_primary' %}
+                    <div class="form-check">
+                        {{ field }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                {% else %}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="help-text">{{ field.help_text }}</div>
+                    {% endif %}
+                {% endif %}
+                
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <div class="buttons">
+            <button type="submit" class="btn">
+                📤 {% if single %}Загрузить фотографию{% else %}Загрузить фотографии{% endif %}
+            </button>
+            <a href="{% url 'profiles:manage_photos' %}" class="btn btn-secondary">📸 К фотографиям</a>
+            <a href="/" class="btn btn-secondary">🏠 Главная</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

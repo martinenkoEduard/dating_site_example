@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление фотографиями - Сайт знакомств{% endblock %}
+
+{% block extra_css %}
+<style>
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .photo-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .photo-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .photo-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .photo-info {
+        padding: 15px;
+    }
+    
+    .photo-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .photo-badge {
+        background: #ffc107;
+        color: #333;
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .no-photos {
+        text-align: center;
+        padding: 50px;
+        color: #666;
+    }
+    
+    .stats {
+        background: #e8f4fd;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .actions {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 5px 10px 5px;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-success {
+        background: #28a745;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📸 Управление фотографиями</h1>
+    
+    <div class="stats">
+        <h3>📊 Статистика</h3>
+        <p><strong>Всего фотографий:</strong> {{ photos_count }}/10</p>
+        <p><strong>Основная фотография:</strong> {% if has_primary %}Установлена{% else %}Не установлена{% endif %}</p>
+    </div>
+    
+    <div class="actions">
+        <a href="{% url 'profiles:upload_photo' %}" class="btn">📤 Загрузить фотографию</a>
+        <a href="{% url 'profiles:upload_multiple_photos' %}" class="btn btn-success">📤📤 Загрузить несколько</a>
+        <a href="{% url 'profiles:my_profile' %}" class="btn btn-secondary">👤 Мой профиль</a>
+        <a href="/" class="btn btn-secondary">🏠 Главная</a>
+    </div>
+    
+    {% if photos %}
+        <div class="photos-grid">
+            {% for photo in photos %}
+                <div class="photo-card">
+                    {% if photo.image %}
+                        <img src="{{ photo.image.url }}" alt="Фото профиля" class="photo-image" 
+                             onerror="this.style.display='none';">
+                    {% endif %}
+                    <div class="photo-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Загружено: {{ photo.uploaded_at|date:"d.m.Y" }}</span>
+                            {% if photo.is_primary %}
+                                <span class="photo-badge">🌟 Основная</span>
+                            {% endif %}
+                        </div>
+                        <div class="photo-actions">
+                            {% if not photo.is_primary %}
+                                <a href="{% url 'profiles:set_primary_photo' photo.id %}" 
+                                   class="btn btn-small">⭐ Сделать основной</a>
+                            {% endif %}
+                            <a href="{% url 'profiles:delete_photo' photo.id %}" 
+                               class="btn btn-danger btn-small"
+                               onclick="return confirm('Вы уверены, что хотите удалить эту фотографию?')">
+                               🗑️ Удалить
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-photos">
+            <h3>📷 У вас пока нет фотографий</h3>
+            <p>Загрузите свои первые фотографии, чтобы другие пользователи могли увидеть вас!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
