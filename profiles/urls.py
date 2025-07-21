@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views_package import profile_views
+from .views_package import photo_views
 
 app_name = 'profiles'
 
@@ -17,11 +18,11 @@ urlpatterns = [
     path('profiles/advanced-search/', profile_views.advanced_search_profiles, name='advanced_search_profiles'),
     
     # Управление фотографиями
-    path('profiles/photos/', views.manage_photos, name='manage_photos'),
-    path('profiles/photos/upload/', views.upload_photo, name='upload_photo'),
-    path('profiles/photos/upload-multiple/', views.upload_multiple_photos, name='upload_multiple_photos'),
-    path('profiles/photos/delete/<int:photo_id>/', views.delete_photo, name='delete_photo'),
-    path('profiles/photos/set-primary/<int:photo_id>/', views.set_primary_photo, name='set_primary_photo'),
+    path('profiles/photos/', photo_views.manage_photos, name='manage_photos'),
+    path('profiles/photos/upload/', photo_views.upload_photo, name='upload_photo'),
+    path('profiles/photos/upload-multiple/', photo_views.upload_multiple_photos, name='upload_multiple_photos'),
+    path('profiles/photos/delete/<int:photo_id>/', photo_views.delete_photo, name='delete_photo'),
+    path('profiles/photos/set-primary/<int:photo_id>/', photo_views.set_primary_photo, name='set_primary_photo'),
     
     # Система сообщений
     path('profiles/conversations/', views.conversations_list, name='conversations_list'),
