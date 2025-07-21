@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Пожаловаться на {{ reported_profile.nickname }} - Сайт знакомств{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .page-title {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .user-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .user-avatar {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+    
+    .user-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .user-details {
+        color: #666;
+    }
+    
+    .warning {
+        background: #fff3cd;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ffeeba;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .form-help {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .form-actions {
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 10px;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        color: white;
+    }
+    
+    .alert {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <h1 class="page-title">⚠️ Пожаловаться на пользователя</h1>
+    
+    <div class="user-info">
+        <div class="user-avatar">
+            {% if reported_profile.gender == 'male' %}👨{% else %}👩{% endif %}
+        </div>
+        <div class="user-name">{{ reported_profile.nickname }}</div>
+        <div class="user-details">{{ reported_profile.age }} лет, {{ reported_profile.get_city_display }}</div>
+    </div>
+    
+    <div class="warning">
+        <strong>Важно:</strong> Жалобы рассматриваются администрацией. Ложные жалобы могут повлечь блокировку вашего аккаунта.
+    </div>
+    
+    {% if form.errors %}
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.reason.id_for_label }}">Причина жалобы:</label>
+            {{ form.reason }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Дополнительные сведения (необязательно):</label>
+            {{ form.description }}
+            <div class="form-help">Максимум 500 символов</div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">📤 Отправить жалобу</button>
+            <a href="{% url 'profiles:view_profile' reported_profile.id %}" class="btn btn-secondary">❌ Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Добавляем классы к полям формы
+document.addEventListener('DOMContentLoaded', function() {
+    const formControls = document.querySelectorAll('select, textarea, input[type="text"]');
+    formControls.forEach(function(control) {
+        control.classList.add('form-control');
+    });
+    
+    // Устанавливаем атрибуты для textarea
+    const textarea = document.querySelector('textarea[name="description"]');
+    if (textarea) {
+        textarea.setAttribute('placeholder', 'Опишите проблему подробнее...');
+        textarea.setAttribute('rows', '4');
+        textarea.setAttribute('maxlength', '500');
+    }
+    
+    // Устанавливаем атрибут required для select
+    const reasonSelect = document.querySelector('select[name="reason"]');
+    if (reasonSelect) {
+        reasonSelect.setAttribute('required', 'required');
+    }
+});
+</script>
+{% endblock %}

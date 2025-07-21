@@ -1,46 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
-
-from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from django.core.management import call_command
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.utils import OperationalError
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.cache import cache
-from django.conf import settings
-from django import forms
-import os
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
-from django.core.management import call_command
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.utils import OperationalError
-from django.db.models import Q
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.cache import cache
-from django.conf import settings
-from django import forms
-import os
-
-from ..models import Profile, Photo, Conversation, Message, MessageLimit, Report
-from ..forms import ProfileForm, ProfileSearchForm, PhotoUploadForm, MultiplePhotoUploadForm, AdvancedProfileSearchForm, MessageForm, ReportForm
+from ..models import Profile, Conversation, Message, MessageLimit, Report
+from ..forms import MessageForm, ReportForm
 from ..cache_utils import (
-    get_cached_user_profile, invalidate_user_profile_cache,
-    get_cached_profile_stats, get_cached_recent_profiles,
-    cache_search_results_data, get_cached_search_results, invalidate_search_cache,
-    get_cached_conversation_list, cache_conversation_list, invalidate_conversation_cache,
-    get_cached_unread_count, cache_unread_count, invalidate_unread_count_cache,
-    cache_profile, cache_search_results, cache_conversation_data,
-    invalidate_all_profile_caches
+    get_cached_user_profile, get_cached_conversation_list, 
+    cache_conversation_list, invalidate_conversation_cache,
+    invalidate_unread_count_cache
 )
 
 
@@ -97,7 +68,11 @@ def conversations_list(request):
         # Кэшируем список переписок
         cache_conversation_list(request.user, conversation_data, timeout=180)
     
-    return render_conversations_list(request, conversation_data)
+    context = {
+        'conversation_data': conversation_data,
+    }
+    
+    return render(request, 'profiles/messages/conversations_list.html', context)
 
 
 @login_required
@@ -175,14 +150,22 @@ def conversation_detail(request, conversation_id):
                     # Инвалидируем кэши переписок для обоих пользователей
                     invalidate_conversation_cache(request.user)
                     invalidate_conversation_cache(other_user)
-                    invalidate_unread_count_cache(other_user)  # У получателя появилось новое непрочитанное сообщение
+                    invalidate_unread_count_cache(other_user)
                     
                     messages.success(request, 'Сообщение отправлено!')
                     return redirect('profiles:conversation_detail', conversation_id=conversation.id)
                 else:
                     messages.error(request, error_msg)
     
-    return render_conversation_detail(request, conversation, other_profile, messages_page, message_form)
+    context = {
+        'conversation': conversation,
+        'other_profile': other_profile,
+        'other_user': other_user,
+        'messages_page': messages_page,
+        'message_form': message_form,
+    }
+    
+    return render(request, 'profiles/messages/conversation_detail.html', context)
 
 
 @login_required
@@ -193,7 +176,7 @@ def start_conversation(request, user_id):
         other_profile = Profile.objects.get(user=other_user)
     except (User.DoesNotExist, Profile.DoesNotExist):
         messages.error(request, 'Пользователь не найден!')
-        return redirect('profiles:search_profiles')
+        return redirect('/')
     
     # Нельзя писать самому себе
     if other_user == request.user:
@@ -231,7 +214,7 @@ def report_user(request, user_id):
         reported_profile = Profile.objects.get(user=reported_user)
     except (User.DoesNotExist, Profile.DoesNotExist):
         messages.error(request, 'Пользователь не найден!')
-        return redirect('profiles:search_profiles')
+        return redirect('/')
     
     # Нельзя жаловаться на самого себя
     if reported_user == request.user:
@@ -261,7 +244,12 @@ def report_user(request, user_id):
             messages.success(request, 'Жалоба подана и будет рассмотрена администрацией.')
             return redirect('profiles:view_profile', profile_id=reported_profile.id)
     
-    return render_report_form(request, reported_profile, form)
+    context = {
+        'reported_profile': reported_profile,
+        'form': form,
+    }
+    
+    return render(request, 'profiles/messages/report_form.html', context)
 
 
 def check_message_limits(sender, receiver):
@@ -298,457 +286,3 @@ def update_message_limits(sender, receiver):
             reverse_limit.reset_unanswered()
     except Exception:
         pass
-
-
-# ====================== РЕНДЕРИНГ СТРАНИЦ СООБЩЕНИЙ ======================
-
-def render_conversations_list(request, conversation_data):
-    """Рендеринг списка переписок"""
-    from django.middleware.csrf import get_token
-    csrf_token = get_token(request)
-    
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Мои сообщения - Сайт знакомств</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }}
-            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }}
-            h1 {{ color: #333; text-align: center; margin-bottom: 30px; }}
-            
-            .header-actions {{ text-align: center; margin-bottom: 30px; }}
-            .btn {{ padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 0 10px; text-decoration: none; display: inline-block; transition: transform 0.2s; }}
-            .btn:hover {{ transform: translateY(-2px); }}
-            .btn-secondary {{ background: #6c757d; }}
-            
-            .conversations-list {{ display: grid; gap: 15px; }}
-            .conversation-item {{ background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 4px solid #667eea; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }}
-            .conversation-item:hover {{ transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
-            .conversation-item.unread {{ border-left-color: #28a745; background: #f0fff4; }}
-            
-            .conv-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
-            .conv-user {{ display: flex; align-items: center; }}
-            .conv-avatar {{ font-size: 24px; margin-right: 15px; }}
-            .conv-name {{ font-size: 18px; font-weight: bold; color: #333; }}
-            .conv-time {{ color: #666; font-size: 14px; }}
-            
-            .conv-last-message {{ color: #555; margin-bottom: 10px; font-style: italic; }}
-            .conv-preview {{ max-height: 40px; overflow: hidden; text-overflow: ellipsis; }}
-            
-            .conv-meta {{ display: flex; justify-content: space-between; align-items: center; }}
-            .unread-badge {{ background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }}
-            .conv-actions {{ display: flex; gap: 10px; }}
-            .btn-small {{ padding: 6px 12px; font-size: 12px; }}
-            
-            .no-conversations {{ text-align: center; padding: 40px; color: #666; }}
-            .messages {{ margin-bottom: 20px; }}
-            .message {{ padding: 12px; border-radius: 8px; margin-bottom: 10px; }}
-            .message.success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
-            .message.error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
-            .message.info {{ background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>💬 Мои сообщения</h1>
-            
-            <div class="messages">
-    """
-    
-    # Добавляем сообщения
-    from django.contrib.messages import get_messages
-    for message in get_messages(request):
-        message_class = message.tags if message.tags else 'info'
-        html += f'<div class="message {message_class}">{message}</div>'
-    
-    html += f"""
-            </div>
-            
-            <div class="header-actions">
-                <a href="/profiles/search/" class="btn">🔍 Найти собеседника</a>
-                <a href="/profiles/advanced-search/" class="btn">🔍🔍 Расширенный поиск</a>
-                <a href="/" class="btn btn-secondary">🏠 Главная</a>
-            </div>
-    """
-    
-    if conversation_data:
-        html += '<div class="conversations-list">'
-        
-        for conv_data in conversation_data:
-            conv = conv_data['conversation']
-            other_profile = conv_data['other_profile']
-            last_message = conv_data['last_message']
-            unread_count = conv_data['unread_count']
-            
-            unread_class = 'unread' if unread_count > 0 else ''
-            gender_icon = "👨" if other_profile.gender == 'male' else "👩"
-            
-            last_msg_preview = ''
-            last_msg_time = ''
-            if last_message:
-                content = last_message.content[:100]
-                if len(last_message.content) > 100:
-                    content += '...'
-                sender_prefix = 'Вы: ' if last_message.sender == request.user else f'{other_profile.nickname}: '
-                last_msg_preview = f'{sender_prefix}{content}'
-                last_msg_time = last_message.sent_at.strftime('%d.%m.%Y %H:%M')
-            
-            html += f"""
-                <div class="conversation-item {unread_class}" onclick="window.location.href='/profiles/conversations/{conv.id}/'">
-                    <div class="conv-header">
-                        <div class="conv-user">
-                            <div class="conv-avatar">{gender_icon}</div>
-                            <div class="conv-name">{other_profile.nickname}</div>
-                        </div>
-                        <div class="conv-time">{last_msg_time}</div>
-                    </div>
-                    
-                    {f'<div class="conv-last-message"><div class="conv-preview">{last_msg_preview}</div></div>' if last_msg_preview else ''}
-                    
-                    <div class="conv-meta">
-                        <div>
-                            <strong>Возраст:</strong> {other_profile.age} лет, 
-                            <strong>Город:</strong> {other_profile.get_city_display()}
-                        </div>
-                        {f'<div class="unread-badge">{unread_count} новых</div>' if unread_count > 0 else ''}
-                    </div>
-                </div>
-            """
-        
-        html += '</div>'
-    else:
-        html += """
-            <div class="no-conversations">
-                <h3>📭 У вас пока нет сообщений</h3>
-                <p>Найдите интересных людей и начните общение!</p>
-                <a href="/profiles/search/" class="btn">🔍 Найти собеседника</a>
-            </div>
-        """
-    
-    html += """
-        </div>
-    </body>
-    </html>
-    """
-    
-    return HttpResponse(html)
-
-
-def render_conversation_detail(request, conversation, other_profile, messages_page, message_form):
-    """Рендеринг детальной страницы переписки"""
-    from django.middleware.csrf import get_token
-    csrf_token = get_token(request)
-    
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Переписка с {other_profile.nickname} - Сайт знакомств</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }}
-            .container {{ max-width: 900px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; height: 80vh; }}
-            
-            .chat-header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px 15px 0 0; }}
-            .header-content {{ display: flex; justify-content: space-between; align-items: center; }}
-            .user-info {{ display: flex; align-items: center; }}
-            .user-avatar {{ font-size: 24px; margin-right: 15px; }}
-            .user-details h2 {{ margin: 0; }}
-            .user-details p {{ margin: 5px 0 0 0; opacity: 0.9; }}
-            .header-actions {{ display: flex; gap: 10px; }}
-            .btn {{ padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; text-decoration: none; font-size: 14px; transition: background 0.2s; }}
-            .btn:hover {{ background: rgba(255,255,255,0.3); }}
-            
-            .messages-container {{ flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }}
-            .message-item {{ max-width: 70%; padding: 12px 16px; border-radius: 18px; word-wrap: break-word; }}
-            .message-sent {{ align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 6px; }}
-            .message-received {{ align-self: flex-start; background: #f1f3f4; color: #333; border-bottom-left-radius: 6px; }}
-            .message-time {{ font-size: 11px; opacity: 0.7; margin-top: 5px; }}
-            .message-status {{ font-size: 11px; opacity: 0.7; margin-top: 5px; }}
-            
-            .message-form {{ background: #f8f9fa; padding: 20px; border-radius: 0 0 15px 15px; border-top: 1px solid #dee2e6; }}
-            .form-row {{ display: flex; gap: 10px; align-items: end; }}
-            .form-control {{ flex: 1; padding: 12px; border: 2px solid #e1e1e1; border-radius: 20px; resize: none; font-family: inherit; }}
-            .form-control:focus {{ border-color: #667eea; outline: none; }}
-            .btn-send {{ padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }}
-            .btn-send:hover {{ opacity: 0.9; }}
-            .btn-send:disabled {{ opacity: 0.5; cursor: not-allowed; }}
-            
-            .form-help {{ font-size: 12px; color: #666; margin-top: 5px; }}
-            .form-errors {{ color: #dc3545; font-size: 14px; margin-bottom: 10px; }}
-            .no-messages {{ text-align: center; color: #666; padding: 40px; }}
-            
-            .messages {{ margin-bottom: 15px; }}
-            .message {{ padding: 12px; border-radius: 8px; margin-bottom: 10px; }}
-            .message.success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
-            .message.error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
-            
-            /* Стили пагинации для сообщений */
-            .pagination {{ margin: 20px 0; text-align: center; }}
-            .pagination-info {{ margin-bottom: 10px; color: #666; font-size: 12px; }}
-            .pagination-controls {{ display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 3px; }}
-            .btn-pagination {{ padding: 6px 10px; margin: 0 1px; text-decoration: none; border-radius: 4px; font-size: 12px; 
-                               background: #f8f9fa; color: #333; border: 1px solid #dee2e6; transition: all 0.2s; }}
-            .btn-pagination:hover {{ background: #e9ecef; transform: translateY(-1px); }}
-            .btn-current {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #667eea; }}
-            .btn-current:hover {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: none; }}
-        </style>
-        <script>
-            function scrollToBottom() {{
-                const container = document.querySelector('.messages-container');
-                container.scrollTop = container.scrollHeight;
-            }}
-            
-            window.addEventListener('load', scrollToBottom);
-            
-            function autoResize(textarea) {{
-                textarea.style.height = 'auto';
-                textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-            }}
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="chat-header">
-                <div class="header-content">
-                    <div class="user-info">
-                        <div class="user-avatar">{"👨" if other_profile.gender == 'male' else "👩"}</div>
-                        <div class="user-details">
-                            <h2>{other_profile.nickname}</h2>
-                            <p>{other_profile.age} лет, {other_profile.get_city_display()}</p>
-                        </div>
-                    </div>
-                    <div class="header-actions">
-                        <a href="/profiles/view/{other_profile.id}/" class="btn">👁️ Профиль</a>
-                        <a href="/profiles/report/{other_profile.user.id}/" class="btn">⚠️ Пожаловаться</a>
-                        <a href="/profiles/conversations/" class="btn">📨 Все сообщения</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="messages">
-    """
-    
-    # Добавляем системные сообщения
-    from django.contrib.messages import get_messages
-    for message in get_messages(request):
-        message_class = message.tags if message.tags else 'info'
-        html += f'<div class="message {message_class}">{message}</div>'
-    
-    html += '</div>'
-    
-    # Контейнер сообщений
-    html += '<div class="messages-container">'
-    
-    if messages_page.object_list:
-        for msg in messages_page.object_list:
-            is_sent = msg.sender == request.user
-            message_class = 'message-sent' if is_sent else 'message-received'
-            
-            # Форматируем время
-            msg_time = msg.sent_at.strftime('%d.%m.%Y %H:%M')
-            
-            # Статус прочтения для отправленных сообщений
-            read_status = ''
-            if is_sent:
-                if msg.is_read:
-                    read_status = f'<div class="message-status">✓✓ Прочитано {msg.read_at.strftime("%H:%M") if msg.read_at else ""}</div>'
-                else:
-                    read_status = '<div class="message-status">✓ Доставлено</div>'
-            
-            html += f"""
-                <div class="message-item {message_class}">
-                    <div>{msg.content}</div>
-                    <div class="message-time">{msg_time}</div>
-                    {read_status}
-                </div>
-            """
-    else:
-        html += """
-            <div class="no-messages">
-                <h3>💭 Начните переписку</h3>
-                <p>Отправьте первое сообщение!</p>
-            </div>
-        """
-    
-    html += '</div>'
-    
-    # Форма отправки сообщения
-    form_errors = ''
-    if message_form.errors:
-        for field, errors in message_form.errors.items():
-            for error in errors:
-                form_errors += f'<div class="form-errors">{error}</div>'
-    
-    message_value = message_form.data.get('content', '') if message_form.is_bound else ''
-    
-    html += f"""
-            <div class="message-form">
-                {form_errors}
-                <form method="post">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
-                    <div class="form-row">
-                        <textarea name="content" class="form-control" placeholder="Введите сообщение..." 
-                                  rows="1" maxlength="1000" oninput="autoResize(this)" required>{message_value}</textarea>
-                        <button type="submit" name="send_message" class="btn-send">Отправить</button>
-                    </div>
-                    <div class="form-help">Минимум 10 символов, максимум 1000. Запрещены контакты и ссылки.</div>
-                </form>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    
-    # Добавляем пагинацию для сообщений
-    if messages_page.has_other_pages():
-        html += """
-            <div class="pagination">
-                <div class="pagination-info">
-        """
-        html += f"""
-                    Страница {messages_page.number} из {messages_page.paginator.num_pages} 
-                    ({messages_page.start_index()}-{messages_page.end_index()} из {messages_page.paginator.count} сообщений)
-        """
-        html += """
-                </div>
-                <div class="pagination-controls">
-        """
-        
-        # Получаем GET параметры (если есть)
-        get_params = request.GET.copy()
-        if 'page' in get_params:
-            del get_params['page']
-        query_string = '&' + get_params.urlencode() if get_params else ''
-        
-        # Первая страница
-        if messages_page.has_previous():
-            html += f'<a href="?page=1{query_string}" class="btn btn-pagination">« Первая</a>'
-            html += f'<a href="?page={messages_page.previous_page_number()}{query_string}" class="btn btn-pagination">‹ Пред</a>'
-        
-        # Текущая страница и соседние
-        start_page = max(1, messages_page.number - 2)
-        end_page = min(messages_page.paginator.num_pages, messages_page.number + 2)
-        
-        for page_num in range(start_page, end_page + 1):
-            if page_num == messages_page.number:
-                html += f'<span class="btn btn-pagination btn-current">{page_num}</span>'
-            else:
-                html += f'<a href="?page={page_num}{query_string}" class="btn btn-pagination">{page_num}</a>'
-        
-        # Последняя страница
-        if messages_page.has_next():
-            html += f'<a href="?page={messages_page.next_page_number()}{query_string}" class="btn btn-pagination">След ›</a>'
-            html += f'<a href="?page={messages_page.paginator.num_pages}{query_string}" class="btn btn-pagination">Последняя »</a>'
-        
-        html += """
-                </div>
-            </div>
-        """
-
-    # Обработка ошибок формы
-    
-    return HttpResponse(html)
-
-
-def render_report_form(request, reported_profile, form):
-    """Рендеринг формы жалобы"""
-    from django.middleware.csrf import get_token
-    csrf_token = get_token(request)
-    
-    form_errors = ''
-    if form.errors:
-        for field, errors in form.errors.items():
-            for error in errors:
-                form_errors += f'<div class="form-errors">{error}</div>'
-    
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Пожаловаться на {reported_profile.nickname} - Сайт знакомств</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }}
-            .container {{ max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }}
-            h1 {{ color: #333; text-align: center; margin-bottom: 30px; }}
-            
-            .user-info {{ background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px; text-align: center; }}
-            .user-avatar {{ font-size: 48px; margin-bottom: 10px; }}
-            .user-name {{ font-size: 24px; font-weight: bold; color: #333; margin-bottom: 5px; }}
-            .user-details {{ color: #666; }}
-            
-            .form-group {{ margin-bottom: 20px; }}
-            .form-group label {{ display: block; margin-bottom: 8px; color: #333; font-weight: bold; }}
-            .form-control {{ width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 16px; box-sizing: border-box; }}
-            .form-control:focus {{ border-color: #667eea; outline: none; }}
-            
-            .form-errors {{ color: #dc3545; font-size: 14px; margin-bottom: 15px; padding: 10px; background: #f8d7da; border-radius: 5px; }}
-            .form-help {{ font-size: 14px; color: #666; margin-top: 5px; }}
-            
-            .form-actions {{ text-align: center; margin-top: 30px; }}
-            .btn {{ padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 0 10px; text-decoration: none; display: inline-block; transition: transform 0.2s; }}
-            .btn:hover {{ transform: translateY(-2px); }}
-            .btn-primary {{ background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }}
-            .btn-secondary {{ background: #6c757d; color: white; }}
-            
-            .warning {{ background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>⚠️ Пожаловаться на пользователя</h1>
-            
-            <div class="user-info">
-                <div class="user-avatar">{"👨" if reported_profile.gender == 'male' else "👩"}</div>
-                <div class="user-name">{reported_profile.nickname}</div>
-                <div class="user-details">{reported_profile.age} лет, {reported_profile.get_city_display()}</div>
-            </div>
-            
-            <div class="warning">
-                <strong>Важно:</strong> Жалобы рассматриваются администрацией. Ложные жалобы могут повлечь блокировку вашего аккаунта.
-            </div>
-            
-            {form_errors}
-            
-            <form method="post">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
-                
-                <div class="form-group">
-                    <label for="id_reason">Причина жалобы:</label>
-                    <select id="id_reason" name="reason" class="form-control" required>
-    """
-    
-    for value, label in form.fields['reason'].choices:
-        selected = 'selected' if form.data.get('reason') == value else ''
-        html += f'<option value="{value}" {selected}>{label}</option>'
-    
-    description_value = form.data.get('description', '') if form.is_bound else ''
-    
-    html += f"""
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_description">Дополнительные сведения (необязательно):</label>
-                    <textarea id="id_description" name="description" class="form-control" rows="4" 
-                              placeholder="Опишите проблему подробнее..." maxlength="500">{description_value}</textarea>
-                    <div class="form-help">Максимум 500 символов</div>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">📤 Отправить жалобу</button>
-                    <a href="/profiles/view/{reported_profile.id}/" class="btn btn-secondary">❌ Отмена</a>
-                </div>
-            </form>
-        </div>
-    </body>
-    </html>
-    """
-    
-    return HttpResponse(html)

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои сообщения - Сайт знакомств{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-actions {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 10px;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .conversations-list {
+        display: grid;
+        gap: 15px;
+    }
+    
+    .conversation-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .conversation-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .conversation-item.unread {
+        border-left-color: #28a745;
+        background: #f0fff4;
+    }
+    
+    .conv-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .conv-user {
+        display: flex;
+        align-items: center;
+    }
+    
+    .conv-avatar {
+        font-size: 24px;
+        margin-right: 15px;
+    }
+    
+    .conv-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .conv-time {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .conv-last-message {
+        color: #555;
+        margin-bottom: 10px;
+        font-style: italic;
+    }
+    
+    .conv-preview {
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .conv-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .unread-badge {
+        background: #28a745;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .no-conversations {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>💬 Мои сообщения</h1>
+    
+    <div class="header-actions">
+        <a href="{% url 'profiles:search_profiles' %}" class="btn">🔍 Найти собеседника</a>
+        <a href="{% url 'profiles:advanced_search_profiles' %}" class="btn">🔍🔍 Расширенный поиск</a>
+        <a href="/" class="btn btn-secondary">🏠 Главная</a>
+    </div>
+    
+    {% if conversation_data %}
+        <div class="conversations-list">
+            {% for conv_data in conversation_data %}
+                {% with conv=conv_data.conversation other_profile=conv_data.other_profile last_message=conv_data.last_message unread_count=conv_data.unread_count %}
+                    <a href="{% url 'profiles:conversation_detail' conv.id %}" 
+                       class="conversation-item {% if unread_count > 0 %}unread{% endif %}">
+                        <div class="conv-header">
+                            <div class="conv-user">
+                                <div class="conv-avatar">
+                                    {% if other_profile.gender == 'male' %}👨{% else %}👩{% endif %}
+                                </div>
+                                <div class="conv-name">{{ other_profile.nickname }}</div>
+                            </div>
+                            <div class="conv-time">
+                                {% if last_message %}
+                                    {{ last_message.sent_at|date:"d.m.Y H:i" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if last_message %}
+                            <div class="conv-last-message">
+                                <div class="conv-preview">
+                                    {% if last_message.sender == request.user %}
+                                        Вы: {{ last_message.content|truncatechars:100 }}
+                                    {% else %}
+                                        {{ other_profile.nickname }}: {{ last_message.content|truncatechars:100 }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="conv-meta">
+                            <div>
+                                <strong>Возраст:</strong> {{ other_profile.age }} лет, 
+                                <strong>Город:</strong> {{ other_profile.get_city_display }}
+                            </div>
+                            {% if unread_count > 0 %}
+                                <div class="unread-badge">{{ unread_count }} новых</div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-conversations">
+            <h3>📭 У вас пока нет сообщений</h3>
+            <p>Найдите интересных людей и начните общение!</p>
+            <a href="{% url 'profiles:search_profiles' %}" class="btn">🔍 Найти собеседника</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
