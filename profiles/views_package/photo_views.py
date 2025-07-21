@@ -25,9 +25,6 @@ from ..cache_utils import (
     invalidate_search_cache
 )
 
-from ..models import Profile, Photo
-from ..forms import PhotoUploadForm, MultiplePhotoUploadForm
-
 
 @login_required
 def manage_photos(request):

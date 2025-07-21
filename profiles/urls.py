@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from .views_package import profile_views
 from .views_package import photo_views
 from .views_package import message_views

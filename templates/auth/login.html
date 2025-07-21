@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход - Сайт знакомств{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 400px;
+        margin: 50px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .auth-header h1 {
+        color: #333;
+        margin: 0;
+        font-size: 2em;
+    }
+    
+    .auth-header p {
+        color: #666;
+        margin-top: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .auth-links a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+    
+    .test-accounts {
+        background: #e2f3ff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #0066cc;
+    }
+    
+    .test-accounts h4 {
+        margin: 0 0 10px 0;
+        color: #0066cc;
+    }
+    
+    .test-accounts p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0;
+    }
+    
+    .errorlist li {
+        color: #721c24;
+        font-size: 14px;
+        background: #f8d7da;
+        padding: 5px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>🔐 Вход</h1>
+        <p>Войдите в свой аккаунт</p>
+    </div>
+    
+    <div class="test-accounts">
+        <h4>🧪 Тестовые аккаунты:</h4>
+        <p><strong>Админ:</strong> admin / admin123</p>
+        <p><strong>Мужчина:</strong> mikhail25 / test123</p>
+        <p><strong>Женщина:</strong> elena23 / test123</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <ul class="errorlist">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">{{ form.password.label }}:</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        {% if form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <button type="submit" class="btn">Войти</button>
+    </form>
+    
+    <div class="auth-links">
+        <p>Нет аккаунта? <a href="{% url 'auth:register' %}">Зарегистрироваться</a></p>
+        <p><a href="{% url 'profiles:home' %}">На главную</a></p>
+    </div>
+</div>
+{% endblock %}
